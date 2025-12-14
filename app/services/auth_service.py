@@ -16,12 +16,12 @@ class AuthService:
         키를 검증하고, 클라이언트를 통해 토큰을 발급받아 필요한 정보를 반환합니다.
         """
 
-        # 1. TODO: 토큰 만료 여부 확인 (캐싱 로직)
+        # 1. TODO: 토큰 만료 여부 확인 (캐싱 로직), 토큰 유효기간 24시간. 매일 아침에 발급 받는 것 추천
 
         # 2. 클라이언트 호출 (전체 응답 데이터를 받음)
         response_data = self.client.get_access_token(appkey=app_key, secretkey=secret_key)
 
-        # 3. 토큰 정보를 추출하여 반환 (예시 응답 구조 활용)
+        # 3. 토큰 정보를 추출하여 반환
         token_info = {
             "access_token": response_data.get("token"),
             "expires_dt": response_data.get("expires_dt"),

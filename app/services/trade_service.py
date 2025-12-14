@@ -1,4 +1,5 @@
 import os
+import asyncio
 from typing import Dict, Any, List
 
 # 가정: RestClient, AuthService, PeakTracker는 구현되어 있음
@@ -11,8 +12,11 @@ from app.models.kiwoom_schema import MinPoleChartData, ChartAnalysisResult
 class TradeService:
     def __init__(self):
         self.rest_client = RestClient()
-        # 가정: AuthService는 구현되어 있으며 issue_token이 작동함
         self.auth_service = AuthService()
+
+        # 🟢 추가: 종목별 매수 이력을 저장하는 인메모리 캐시
+        # { '종목코드': 가장 최근 매수가 실행된 하락률 (float, 예: 0.08) }
+        self.order_status_cache: Dict[str, float] = {}
 
     def analyze_minute_chart_peak(self, stk_cd: str, tic_scope: str = '1') -> ChartAnalysisResult:
         """단일 종목의 분봉 데이터를 조회하고 PeakTracker 알고리즘을 적용합니다."""
@@ -136,3 +140,30 @@ class TradeService:
                 continue
 
         return result_list
+
+
+    async def execute_buy_order(self, stk_cd: str, ord_qty: int) -> Dict[str, Any]:
+        """자동 매수 주문을 실행하고 결과를 반환합니다."""
+        if ord_qty <= 0:
+            raise ValueError("주문 수량은 0보다 커야 합니다.")
+
+        try:
+            # 1. 유효 토큰 가져오기 (비동기 처리 가정)
+            # 🚨 실제 환경에 맞게 토큰 획득 로직을 구현해야 합니다.
+            # 예: token = await self.auth_service.get_valid_token()
+            token = os.getenv("MY_KIWOOM_TOKEN")  # 임시 토큰 획득 가정
+
+            # 2. 주문 API 호출
+            order_result = await self.rest_client.stock_buy_order(
+                token=token,
+                stk_cd=stk_cd,
+                ord_qty=ord_qty
+            )
+
+            # 3. 결과 반환
+            return order_result
+
+        except Exception as e:
+            # 주문 실패 시 예외 처리
+            print(f"FATAL: {stk_cd} 매수 주문 실패 - {e}")
+            raise

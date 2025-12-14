@@ -99,3 +99,19 @@ class RestClient:
 
         except requests.exceptions.RequestException as e:
             raise ConnectionError(f"네트워크 오류로 거래대금 상위 조회에 실패했습니다: {e}")
+
+    async def stock_buy_order(self, token: str, stk_cd: str, ord_qty: int) -> Dict[str, Any]:
+        """주식 매수주문 (kt10000) - 시장가, 국내거래소(KRX) 기준"""
+
+        # 🚨 시장가(trde_tp: '3')를 사용하고 주문단가(ord_uv)와 조건단가(cond_uv)는 비워둡니다.
+        data = {
+            'dmst_stex_tp': 'KRX',  # 국내거래소구분: KRX
+            'stk_cd': stk_cd,
+            'ord_qty': str(ord_qty),  # 주문수량은 문자열로 변환하여 전달
+            'ord_uv': '',  # 주문단가 (시장가이므로 비움)
+            'trde_tp': '3',  # 매매구분: 시장가(3)
+            'cond_uv': '',  # 조건단가 (비움)
+        }
+
+        # 🟢 비동기 래퍼 함수를 통해 API 호출
+        return await self._async_request_post('/api/dostk/ordr', token, 'kt10000', data)

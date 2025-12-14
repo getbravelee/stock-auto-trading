@@ -1,12 +1,16 @@
 from fastapi import FastAPI
-# 분리된 라우터를 임포트
 from app.api.endpoints.auth_router import auth_router
 from app.api.endpoints.trade_router import trade_router
-
+from app.api.endpoints.auto_trade_router import auto_trade_router
 
 # .env 파일 로드 (가장 먼저 수행)
 from dotenv import load_dotenv
 load_dotenv() 
+
+# 🟢 자동 매매 전략 상수 정의
+BUY_QUANTITY = 1  # 🚨 요청하신 테스트 주문 수량 (1주)
+# 🚨 8%, 10%, 12% 하락 레벨 (내림차순 정렬 필수 - 깊은 하락부터 확인)
+DIP_LEVELS = [0.12, 0.10, 0.08]
 
 # 1. FastAPI 애플리케이션 초기화
 app = FastAPI(
@@ -18,6 +22,8 @@ app = FastAPI(
 # 2. 라우터 등록
 app.include_router(auth_router)
 app.include_router(trade_router)
+app.include_router(auto_trade_router)
+
 
 
 # 3. 루트 엔드포인트

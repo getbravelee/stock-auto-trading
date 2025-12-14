@@ -39,6 +39,8 @@ async def analyze_chart_for_peak(
             status_code=500,
             detail=f"차트 분석 요청 실패: {str(e)}"
         )
+
+
 @trade_router.get("/scan/top-dip", response_model=List[Dict[str, Any]])
 async def scan_for_dip_opportunities(
     limit: int = Query(50, description="조회할 거래대금 상위 종목 수"),
