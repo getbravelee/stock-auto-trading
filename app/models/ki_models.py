@@ -29,3 +29,8 @@ class KIEndpoints:
     TOKEN_URL = f"{BASE_URL}/oauth2/tokenP"
     WEBSOCKET_KEY_URL = f"{BASE_URL}/oauth2/Approval"
     WEBSOCKET_URL = "ws://ops.koreainvestment.com:21000/tryitout/H0STASP0"
+
+@dataclass
+class KIApprovalKeyResponse:
+    """한투 실시간 키 발급 성공 응답"""
+    approval_key: str

@@ -41,16 +41,19 @@ class KIAuthService:
         return token_info
 
     def issue_websocket_key(self, token: str) -> str:
-        """실시간 키를 발급받아 approval_key 문자열을 반환합니다."""
+        """
+        실시간 키를 발급받아 approval_key 문자열을 반환합니다.
+        """
 
         # 1. 클라이언트 호출
         response_data = self.client.issue_websocket_key(
             token=token,
             appkey=self.app_key,
-            secretkey=self.secret_key
+            secretkey=self.secret_key  # 환경 변수에서 로드된 키 사용
         )
 
-        # 2. 데이터 모델로 변환 및 유효성 검증
+        # 2. 데이터 모델로 변환 (응답에 'approval_key' 필드가 있는지 검증)
         approval_response = KIApprovalKeyResponse(**response_data)
 
+        # 3. 'approval_key' 반환
         return approval_response.approval_key

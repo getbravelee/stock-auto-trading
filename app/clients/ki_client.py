@@ -64,3 +64,31 @@ class KIRestClient:
             headers=headers
         )
         return raw_response
+
+    def issue_websocket_key(self, token: str, appkey: str, secretkey: str) -> Dict[str, Any]:
+        """
+        실시간 (웹소켓) 접속 키 발급 요청 (접근 토큰 필요).
+        요청 바디는 사용하지 않고 헤더만 사용합니다.
+        """
+
+        if not token:
+            raise ValueError("접근 토큰(access_token)이 필요합니다.")
+
+        # 1. 요청 헤더 구성
+        headers: Dict[str, str] = {
+            "content-type": "application/json",
+            "Authorization": f"Bearer {token}",  # 접근 토큰 사용
+            "appkey": appkey,
+            "appsecret": secretkey,
+        }
+
+        # 2. 요청 실행 (Body 없이 POST 요청)
+        raw_response = self._request(
+            method="POST",
+            url=self.approval_url,
+            headers=headers
+            # json_data는 None이 됩니다.
+        )
+
+        # 3. 응답 (Dict[str, Any]) 반환
+        return raw_response
